@@ -1,9 +1,10 @@
-import { createWalletClient, custom, createPublicClient, parseEther, defineChain } from 'https://esm.sh/viem'
+import { createWalletClient, custom, createPublicClient, parseEther, defineChain, formatEther } from 'https://esm.sh/viem'
 import { contractAddress, coffeeAbi } from './constants-js.js'
 
 const connectButton = document.getElementById('connectButton')
 const fundButton = document.getElementById('fundButton')
 const ethAmountInput = document.getElementById('ethAmount')
+const balanceButton = document.getElementById('balanceButton')
 
 let walletClient
 let publicClient
@@ -37,17 +38,33 @@ async function fund() {
             transport: custom(window.ethereum)
         })
     
-        await publicClient.simulateContract({
+        const {request} = await publicClient.simulateContract({
             address: contractAddress,
             abi: coffeeAbi,
             functionName: 'fund',
             account: connectedAccount,
             chain: currentChain,
-            value: parseEther(ethAmount),
+            value: parseEther(ethAmount), // 1 -> 1000000000000000000 
         })
+        
+        const hash = await walletClient.writeContract(request)
+        console.log(hash)
+
     }
     else{
         connectButton.innerText = 'Please install MetaMask!'
+    }
+}
+
+async function getBalance() {
+    if(typeof window.ethereum !== 'undefined'){
+        publicClient = createPublicClient({
+            transport: custom(window.ethereum)
+        })
+        const balance = await publicClient.getBalance({
+            address: contractAddress
+        })
+        console.log(formatEther(balance)) // 1000000000000000000 -> 1
     }
 }
 
@@ -73,4 +90,5 @@ async function getCurrentChain(client) {
 
 connectButton.onclick = connect
 fundButton.onclick = fund
+balanceButton.onclick = getBalance
 
