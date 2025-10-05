@@ -5,7 +5,7 @@
     - Buy Coffee
         - Button to but coffee
         - Call a function on a smart contract
-        - Have a test function that we can call?
+        - Have a test blockchain that we can call?
     - Get Balance
     - Withdraw
   
